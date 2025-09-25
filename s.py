@@ -4,6 +4,7 @@ import time
 import hashlib
 from datetime import datetime, timezone
 
+
 def generate_fyber_hash_payload(user_id, url):
     salt = "j8n5HxYA0ZVF"
     utc_now = datetime.now(timezone.utc)
@@ -17,6 +18,7 @@ def generate_fyber_hash_payload(user_id, url):
         "timestamp": unix_timestamp,
         "hash_value": hex_digest
     }
+
 
 def send_fairbid_request(user_id):
     url = "https://fairbid.inner-active.mobi/simpleM2M/fyberMediation?spotId=2238156"
@@ -57,7 +59,7 @@ def send_fairbid_request(user_id):
             print(f"Completion status: {completion_response.status_code}")
             try:
                 print("Completion response:", completion_response.json())
-            except:
+            except ValueError:
                 print("Completion response (text):", completion_response.text)
 
         print("\n🎉 All requests completed!")
@@ -71,6 +73,7 @@ def send_fairbid_request(user_id):
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
 
+
 if __name__ == "__main__":
     print("🚀 Starting FairBid API infinite loop...\n")
     run = 1
@@ -80,4 +83,3 @@ if __name__ == "__main__":
         print(f"✅ Run {run} finished!\n")
         run += 1
         time.sleep(3)  # ⏱️ wait 3 seconds before the next run
-        
