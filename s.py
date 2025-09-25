@@ -3,6 +3,7 @@ import json
 import time
 import hashlib
 from datetime import datetime, timezone
+import os
 
 
 def generate_fyber_hash_payload(user_id, url):
@@ -11,23 +12,26 @@ def generate_fyber_hash_payload(user_id, url):
     formatted_timestamp = utc_now.strftime("%Y-%m-%d %H:%M:%S")
     unix_timestamp = int(utc_now.timestamp())
     string_to_hash = f"{url}{formatted_timestamp}{salt}"
-    hex_digest = hashlib.sha512(string_to_hash.encode('utf-8')).hexdigest()
+    hex_digest = hashlib.sha512(string_to_hash.encode("utf-8")).hexdigest()
 
     return {
         "user_id": user_id,
         "timestamp": unix_timestamp,
-        "hash_value": hex_digest
+        "hash_value": hex_digest,
     }
 
 
 def send_fairbid_request(user_id):
-    url = "https://fairbid.inner-active.mobi/simpleM2M/fyberMediation?spotId=2238156"
-    headers = {"Content-Type": "application/json"}
-    json_file_path = "/storage/emulated/0/Download/Telegram/http_req_94f3e2e6-7ef2-48c2-91a2-19bb06a0d0cc (1).hcy"
+    # Path to the bundled JSON file
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    json_file_path = os.path.join(BASE_DIR, "data", "request.json")
 
     try:
-        with open(json_file_path, 'r') as file:
+        with open(json_file_path, "r") as file:
             json_data = json.load(file)
+
+        url = "https://fairbid.inner-active.mobi/simpleM2M/fyberMediation?spotId=2238156"
+        headers = {"Content-Type": "application/json"}
 
         print("📤 Sending POST request to FairBid API...")
         response = requests.post(url, headers=headers, json=json_data)
@@ -36,8 +40,8 @@ def send_fairbid_request(user_id):
         response_data = response.json()
         print(f"📄 Response data: {json.dumps(response_data, indent=2)}")
 
-        impression_url = response_data.get('impression')
-        completion_url = response_data.get('completion')
+        impression_url = response_data.get("impression")
+        completion_url = response_data.get("completion")
 
         if impression_url:
             print("\n🎯 Executing impression URL...")
@@ -54,7 +58,7 @@ def send_fairbid_request(user_id):
             completion_response = requests.post(
                 completion_url,
                 headers={"Content-Type": "application/json"},
-                json=completion_payload
+                json=completion_payload,
             )
             print(f"Completion status: {completion_response.status_code}")
             try:
